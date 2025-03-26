@@ -1,37 +1,6 @@
-activity_main.xml
-
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="20dp">
-
-    <!-- College Name -->
-    <TextView
-        android:id="@+id/txtCollegeName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="XYZ College"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:fontFamily="serif"
-        android:textColor="@color/black"
-        android:padding="20dp"/>
-
-    <!-- Button to Change Color -->
-    <Button
-        android:id="@+id/btnChangeColor"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Change Color" />
-</LinearLayout>
-
-
 MainActivity.java
 
-package com.example.collegetextstyle;
+package com.example.textstylechanger;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -39,50 +8,81 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
-import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
-    TextView txtCollegeName;
-    Button btnChangeColor;
+    private TextView collegeName;
+    private Button btnChangeColor;
+    private boolean isColorChanged = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        txtCollegeName = findViewById(R.id.txtCollegeName);
+        collegeName = findViewById(R.id.txtCollegeName);
         btnChangeColor = findViewById(R.id.btnChangeColor);
 
         btnChangeColor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Generate a random color
-                Random random = new Random();
-                int color = Color.rgb(random.nextInt(256), random.nextInt(256), random.nextInt(256));
-                txtCollegeName.setTextColor(color);
+                if (isColorChanged) {
+                    collegeName.setTextColor(Color.BLUE); // Original color
+                } else {
+                    collegeName.setTextColor(Color.RED); // Change color
+                }
+                isColorChanged = !isColorChanged;
             }
         });
     }
 }
 
 
-res/values/styles.xml.
+activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <!-- College Name TextView -->
+    <TextView
+        android:id="@+id/txtCollegeName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="XYZ College"
+        android:textSize="24sp"
+        android:textStyle="bold|italic"
+        android:textColor="@color/black"
+        android:fontFamily="sans-serif-condensed"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="16dp"/>
+
+    <!-- Button to Change Color -->
+    <Button
+        android:id="@+id/btnChangeColor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Change Color"
+        app:layout_constraintTop_toBottomOf="@id/txtCollegeName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:marginTop="20dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+res/values/colors.xml
 
 <resources>
-    <style name="CustomTextStyle">
-        <item name="android:textSize">30sp</item>
-        <item name="android:textStyle">italic</item>
-        <item name="android:fontFamily">cursive</item>
-    </style>
+    <color name="black">#000000</color>
+    <color name="blue">#0000FF</color>
+    <color name="red">#FF0000</color>
 </resources>
 
-update textView in activity_main.xml
 
-<TextView
-    android:id="@+id/txtCollegeName"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="XYZ College"
-    style="@style/CustomTextStyle"
-    android:textColor="@color/black"
-    android:padding="20dp"/>

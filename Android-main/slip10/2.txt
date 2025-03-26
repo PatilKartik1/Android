@@ -1,29 +1,108 @@
+AndroidManifest.xml
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.fragmentcommunication">
+    
+    <application
+        android:allowBackup="true"
+        android:theme="@style/Theme.FragmentCommunication">
+
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+    </application>
+</manifest>
+
+
 activity_main.xml
 
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:gravity="center">
 
-    <fragment
-        android:id="@+id/fragmentContainer"
-        android:name="com.example.fragmentdemo.MyFragment"
+    <EditText
+        android:id="@+id/inputText"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="wrap_content"
+        android:hint="Enter message"/>
 
-</FrameLayout>
+    <Button
+        android:id="@+id/sendButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send to Fragment"/>
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragmentContainer"
+        android:name="com.example.fragmentcommunication.MyFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>
 
 
-    MyFragment.java
+MainActivity.java
 
-    package com.example.fragmentdemo;
+package com.example.fragmentcommunication;
 
-import android.content.Context;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
+public class MainActivity extends AppCompatActivity {
+
+    private EditText inputText;
+    private Button sendButton;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        inputText = findViewById(R.id.inputText);
+        sendButton = findViewById(R.id.sendButton);
+
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String message = inputText.getText().toString();
+
+                // Send message to fragment
+                MyFragment fragment = new MyFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("message", message);
+                fragment.setArguments(bundle);
+
+                // Replace fragment
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction transaction = fragmentManager.beginTransaction();
+                transaction.replace(R.id.fragmentContainer, fragment);
+                transaction.commit();
+            }
+        });
+    }
+}
+
+MyFragment.java
+
+package com.example.fragmentcommunication;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,57 +110,43 @@ import androidx.fragment.app.Fragment;
 
 public class MyFragment extends Fragment {
 
-    private OnFragmentInteractionListener mListener;
-
-    public interface OnFragmentInteractionListener {
-        void onFragmentMessage(String message);
-    }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
-        }
-    }
+    private TextView messageText;
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_layout, container, false);
-        Button btnSendMessage = view.findViewById(R.id.btnSendMessage);
-        btnSendMessage.setOnClickListener(v -> {
-            if (mListener != null) {
-                mListener.onFragmentMessage("Hello from Fragment!");
-            }
-        });
+        messageText = view.findViewById(R.id.messageText);
+
+        // Get data from Bundle
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            String message = bundle.getString("message");
+            messageText.setText(message);
+        }
+
         return view;
     }
 }
 
+fragment_layout.xml
 
-MainActivity.java
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="20dp">
 
-package com.example.fragmentdemo;
+    <TextView
+        android:id="@+id/messageText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Waiting for message..."
+        android:textSize="18sp"/>
 
-import android.os.Bundle;
-import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
+</LinearLayout>
 
-public class MainActivity extends AppCompatActivity implements MyFragment.OnFragmentInteractionListener {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-    }
-
-    @Override
-    public void onFragmentMessage(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
-}
 
 

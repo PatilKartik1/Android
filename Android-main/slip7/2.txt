@@ -1,3 +1,8 @@
+AndroidManifest.xml
+
+<uses-permission android:name="android.permission.CALL_PHONE"/>
+
+
 activity_main.xml
 
 <?xml version="1.0" encoding="utf-8"?>
@@ -8,19 +13,19 @@ activity_main.xml
     android:padding="20dp">
 
     <EditText
-        android:id="@+id/phoneNumber"
+        android:id="@+id/etPhoneNumber"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter Phone Number"
-        android:inputType="phone"/>
+        android:inputType="phone"
+        android:textSize="18sp"/>
 
     <Button
-        android:id="@+id/callButton"
-        android:layout_width="match_parent"
+        android:id="@+id/btnCall"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Call"
-        android:marginTop="10dp"/>
-
+        android:text="Make Call"
+        android:layout_marginTop="10dp"/>
 </LinearLayout>
 
 
@@ -28,42 +33,68 @@ MainActivity.java
 
 package com.example.phonecalldemo;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
 
-    private EditText phoneNumber;
-    private Button callButton;
+    EditText etPhoneNumber;
+    Button btnCall;
+    private static final int REQUEST_CALL_PERMISSION = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        phoneNumber = findViewById(R.id.phoneNumber);
-        callButton = findViewById(R.id.callButton);
+        etPhoneNumber = findViewById(R.id.etPhoneNumber);
+        btnCall = findViewById(R.id.btnCall);
 
-        callButton.setOnClickListener(v -> {
-            String number = phoneNumber.getText().toString().trim();
-            if (!number.isEmpty()) {
-                Intent intent = new Intent(Intent.ACTION_DIAL);
-                intent.setData(Uri.parse("tel:" + number));
-                startActivity(intent);
-            } else {
-                Toast.makeText(MainActivity.this, "Please enter a phone number!", Toast.LENGTH_SHORT).show();
+        btnCall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                makePhoneCall();
             }
         });
+    }
+
+    private void makePhoneCall() {
+        String phoneNumber = etPhoneNumber.getText().toString();
+        if (phoneNumber.isEmpty()) {
+            Toast.makeText(this, "Enter a phone number", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE}, REQUEST_CALL_PERMISSION);
+        } else {
+            Intent callIntent = new Intent(Intent.ACTION_CALL);
+            callIntent.setData(Uri.parse("tel:" + phoneNumber));
+            startActivity(callIntent);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_CALL_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                makePhoneCall();
+            } else {
+                Toast.makeText(this, "Permission Denied!", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }
 
 
-AndroidManifest.xml
-
-<uses-permission android:name="android.permission.CALL_PHONE"/>

@@ -1,89 +1,89 @@
 activity_main.xml
 
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout 
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="20dp">
+    android:layout_height="match_parent">
 
     <EditText
         android:id="@+id/etNumber1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Enter first number"
+        android:hint="Enter First Number"
         android:inputType="numberDecimal"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:padding="10dp"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        android:layout_margin="16dp"/>
 
     <EditText
         android:id="@+id/etNumber2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Enter second number"
+        android:hint="Enter Second Number"
         android:inputType="numberDecimal"
         app:layout_constraintTop_toBottomOf="@id/etNumber1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:padding="10dp"
-        android:layout_marginTop="10dp"/>
+        android:layout_margin="16dp"/>
 
     <Button
         android:id="@+id/btnAdd"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add (+)"
-        app:layout_constraintTop_toBottomOf="@id/etNumber2"
+        android:text="Add"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="20dp"/>
+        app:layout_constraintTop_toBottomOf="@id/etNumber2"
+        android:layout_margin="16dp"/>
 
     <Button
         android:id="@+id/btnSubtract"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Subtract (-)"
+        android:text="Subtract"
+        app:layout_constraintStart_toEndOf="@id/btnAdd"
         app:layout_constraintTop_toBottomOf="@id/etNumber2"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="20dp"/>
+        android:layout_margin="16dp"/>
 
     <Button
         android:id="@+id/btnMultiply"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Multiply (×)"
-        app:layout_constraintTop_toBottomOf="@id/btnAdd"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="10dp"/>
+        android:text="Multiply"
+        app:layout_constraintStart_toEndOf="@id/btnSubtract"
+        app:layout_constraintTop_toBottomOf="@id/etNumber2"
+        android:layout_margin="16dp"/>
 
     <Button
         android:id="@+id/btnDivide"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Divide (÷)"
-        app:layout_constraintTop_toBottomOf="@id/btnSubtract"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="10dp"/>
+        android:text="Divide"
+        app:layout_constraintStart_toEndOf="@id/btnMultiply"
+        app:layout_constraintTop_toBottomOf="@id/etNumber2"
+        android:layout_margin="16dp"/>
 
     <TextView
         android:id="@+id/tvResult"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Result: "
-        android:textSize="20sp"
+        android:text="Result:"
+        android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/btnMultiply"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/btnAdd"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginTop="16dp"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 MainActivity.java
 
-package com.example.arithmeticcalculator;
+package com.example.arithmeticoperations;
 
 import android.os.Bundle;
 import android.view.View;
@@ -94,9 +94,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    private EditText etNumber1, etNumber2;
-    private Button btnAdd, btnSubtract, btnMultiply, btnDivide;
-    private TextView tvResult;
+    EditText etNumber1, etNumber2;
+    TextView tvResult;
+    Button btnAdd, btnSubtract, btnMultiply, btnDivide;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,47 +105,47 @@ public class MainActivity extends AppCompatActivity {
 
         etNumber1 = findViewById(R.id.etNumber1);
         etNumber2 = findViewById(R.id.etNumber2);
+        tvResult = findViewById(R.id.tvResult);
         btnAdd = findViewById(R.id.btnAdd);
         btnSubtract = findViewById(R.id.btnSubtract);
         btnMultiply = findViewById(R.id.btnMultiply);
         btnDivide = findViewById(R.id.btnDivide);
-        tvResult = findViewById(R.id.tvResult);
 
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                calculate('+');
+                calculate("+");
             }
         });
 
         btnSubtract.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                calculate('-');
+                calculate("-");
             }
         });
 
         btnMultiply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                calculate('*');
+                calculate("*");
             }
         });
 
         btnDivide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                calculate('/');
+                calculate("/");
             }
         });
     }
 
-    private void calculate(char operator) {
-        String num1Str = etNumber1.getText().toString().trim();
-        String num2Str = etNumber2.getText().toString().trim();
+    private void calculate(String operation) {
+        String num1Str = etNumber1.getText().toString();
+        String num2Str = etNumber2.getText().toString();
 
         if (num1Str.isEmpty() || num2Str.isEmpty()) {
-            tvResult.setText("Please enter both numbers");
+            tvResult.setText("Please enter both numbers!");
             return;
         }
 
@@ -153,19 +153,19 @@ public class MainActivity extends AppCompatActivity {
         double num2 = Double.parseDouble(num2Str);
         double result = 0;
 
-        switch (operator) {
-            case '+':
+        switch (operation) {
+            case "+":
                 result = num1 + num2;
                 break;
-            case '-':
+            case "-":
                 result = num1 - num2;
                 break;
-            case '*':
+            case "*":
                 result = num1 * num2;
                 break;
-            case '/':
+            case "/":
                 if (num2 == 0) {
-                    tvResult.setText("Cannot divide by zero");
+                    tvResult.setText("Error: Division by Zero");
                     return;
                 }
                 result = num1 / num2;
@@ -175,3 +175,5 @@ public class MainActivity extends AppCompatActivity {
         tvResult.setText("Result: " + result);
     }
 }
+
+

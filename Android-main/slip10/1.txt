@@ -1,3 +1,23 @@
+AndroidManifest.xml
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.switchtoggle">
+    
+    <application
+        android:allowBackup="true"
+        android:theme="@style/Theme.SwitchToggle">
+
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+    </application>
+</manifest>
+
+
 activity_main.xml
 
 <?xml version="1.0" encoding="utf-8"?>
@@ -5,6 +25,7 @@ activity_main.xml
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:gravity="center"
     android:padding="20dp">
 
     <Switch
@@ -13,28 +34,20 @@ activity_main.xml
         android:layout_height="wrap_content"
         android:text="Switch Button"/>
 
-    <TextView
-        android:id="@+id/tvSwitchStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Switch is OFF"
-        android:textSize="18sp"
-        android:padding="10dp"/>
-
     <ToggleButton
         android:id="@+id/toggleButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textOn="ON"
-        android:textOff="OFF"/>
+        android:textOn="Toggle ON"
+        android:textOff="Toggle OFF"/>
 
     <TextView
-        android:id="@+id/tvToggleStatus"
+        android:id="@+id/statusText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Toggle is OFF"
+        android:text="Status: OFF"
         android:textSize="18sp"
-        android:padding="10dp"/>
+        android:padding="20dp"/>
 
 </LinearLayout>
 
@@ -44,6 +57,7 @@ MainActivity.java
 package com.example.switchtoggle;
 
 import android.os.Bundle;
+import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -51,9 +65,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView tvSwitchStatus, tvToggleStatus;
     private Switch switchButton;
     private ToggleButton toggleButton;
+    private TextView statusText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,27 +75,27 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         switchButton = findViewById(R.id.switchButton);
-        tvSwitchStatus = findViewById(R.id.tvSwitchStatus);
         toggleButton = findViewById(R.id.toggleButton);
-        tvToggleStatus = findViewById(R.id.tvToggleStatus);
+        statusText = findViewById(R.id.statusText);
 
+        // Handle Switch events
         switchButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
-                tvSwitchStatus.setText("Switch is ON");
+                statusText.setText("Switch: ON");
             } else {
-                tvSwitchStatus.setText("Switch is OFF");
+                statusText.setText("Switch: OFF");
             }
         });
 
+        // Handle ToggleButton events
         toggleButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
-                tvToggleStatus.setText("Toggle is ON");
+                statusText.setText("Toggle: ON");
             } else {
-                tvToggleStatus.setText("Toggle is OFF");
+                statusText.setText("Toggle: OFF");
             }
         });
     }
 }
-
 
 

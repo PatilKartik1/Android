@@ -1,133 +1,47 @@
 AndroidManifest.xml
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.customerapp">
+    package="com.example.customerdatabase">
 
     <uses-permission android:name="android.permission.INTERNET"/>
-
+    
     <application
         android:allowBackup="true"
-        android:theme="@style/Theme.CustomerApp"
-        android:label="Customer App">
+        android:theme="@style/Theme.CustomerDatabase">
         
-        <activity
-            android:name=".MainActivity"
-            android:exported="true">
+        <activity android:name=".MainActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
     </application>
 </manifest>
-
-
-DatabaseHelper.java
-
-package com.example.customerapp;
-
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.widget.Toast;
-
-public class DatabaseHelper extends SQLiteOpenHelper {
-
-    private static final String DATABASE_NAME = "CustomerDB";
-    private static final int DATABASE_VERSION = 1;
-    private static final String TABLE_NAME = "Customer";
-    private static final String COLUMN_ID = "id";
-    private static final String COLUMN_NAME = "name";
-    private static final String COLUMN_ADDRESS = "address";
-    private static final String COLUMN_PHONE = "phno";
-    private Context context;
-
-    public DatabaseHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        this.context = context;
-    }
-
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        String createTable = "CREATE TABLE " + TABLE_NAME + " (" +
-                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COLUMN_NAME + " TEXT, " +
-                COLUMN_ADDRESS + " TEXT, " +
-                COLUMN_PHONE + " TEXT)";
-        db.execSQL(createTable);
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-        onCreate(db);
-    }
-
-    public void insertCustomer(String name, String address, String phone) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_NAME, name);
-        values.put(COLUMN_ADDRESS, address);
-        values.put(COLUMN_PHONE, phone);
-
-        long result = db.insert(TABLE_NAME, null, values);
-        if (result != -1) {
-            Toast.makeText(context, "Customer Inserted", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(context, "Insertion Failed", Toast.LENGTH_SHORT).show();
-        }
-        db.close();
-    }
-
-    public String getAllCustomers() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
-        StringBuilder data = new StringBuilder();
-
-        if (cursor.moveToFirst()) {
-            do {
-                data.append("ID: ").append(cursor.getInt(0)).append("\n")
-                    .append("Name: ").append(cursor.getString(1)).append("\n")
-                    .append("Address: ").append(cursor.getString(2)).append("\n")
-                    .append("Phone: ").append(cursor.getString(3)).append("\n\n");
-            } while (cursor.moveToNext());
-        } else {
-            data.append("No Customers Found");
-        }
-
-        cursor.close();
-        db.close();
-        return data.toString();
-    }
-}
 
 
 activity_main.xml
 
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout 
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="20dp">
+    tools:context=".MainActivity">
 
     <EditText
         android:id="@+id/etName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter Name"
-        android:inputType="textPersonName"/>
+        android:padding="10dp"/>
 
     <EditText
         android:id="@+id/etAddress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter Address"
-        android:layout_marginTop="10dp"
+        android:padding="10dp"
         app:layout_constraintTop_toBottomOf="@id/etName"/>
 
     <EditText
@@ -136,7 +50,7 @@ activity_main.xml
         android:layout_height="wrap_content"
         android:hint="Enter Phone Number"
         android:inputType="phone"
-        android:layout_marginTop="10dp"
+        android:padding="10dp"
         app:layout_constraintTop_toBottomOf="@id/etAddress"/>
 
     <Button
@@ -144,38 +58,111 @@ activity_main.xml
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Insert Customer"
-        android:layout_marginTop="20dp"
         app:layout_constraintTop_toBottomOf="@id/etPhone"
-        app:layout_constraintStart_toStartOf="parent"/>
-
-    <Button
-        android:id="@+id/btnShow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Show Customers"
-        android:layout_marginTop="20dp"
-        app:layout_constraintTop_toBottomOf="@id/etPhone"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <Button
+        android:id="@+id/btnShowAll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show All Customers"
+        app:layout_constraintTop_toBottomOf="@id/btnInsert"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+DatabaseHelper.java
+
+
+package com.example.customerdatabase;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+public class DatabaseHelper extends SQLiteOpenHelper {
+    private static final String DATABASE_NAME = "CustomerDB";
+    private static final int DATABASE_VERSION = 1;
+    private static final String TABLE_NAME = "Customer";
+    private static final String COLUMN_ID = "id";
+    private static final String COLUMN_NAME = "name";
+    private static final String COLUMN_ADDRESS = "address";
+    private static final String COLUMN_PHONE = "phno";
+
+    public DatabaseHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        String createTableQuery = "CREATE TABLE " + TABLE_NAME + " (" +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_NAME + " TEXT, " +
+                COLUMN_ADDRESS + " TEXT, " +
+                COLUMN_PHONE + " TEXT)";
+        db.execSQL(createTableQuery);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        onCreate(db);
+    }
+
+    // Insert new customer
+    public boolean insertCustomer(String name, String address, String phone) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_NAME, name);
+        values.put(COLUMN_ADDRESS, address);
+        values.put(COLUMN_PHONE, phone);
+
+        long result = db.insert(TABLE_NAME, null, values);
+        return result != -1;
+    }
+
+    // Get all customers
+    public String getAllCustomers() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+
+        StringBuilder customerList = new StringBuilder();
+        if (cursor.moveToFirst()) {
+            do {
+                customerList.append("ID: ").append(cursor.getInt(0)).append("\n");
+                customerList.append("Name: ").append(cursor.getString(1)).append("\n");
+                customerList.append("Address: ").append(cursor.getString(2)).append("\n");
+                customerList.append("Phone: ").append(cursor.getString(3)).append("\n\n");
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return customerList.toString();
+    }
+}
 
 
 MainActivity.java
 
-package com.example.customerapp;
+
+package com.example.customerdatabase;
 
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    EditText etName, etAddress, etPhone;
-    Button btnInsert, btnShow;
-    DatabaseHelper dbHelper;
+    private EditText etName, etAddress, etPhone;
+    private Button btnInsert, btnShowAll;
+    private DatabaseHelper databaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,10 +173,11 @@ public class MainActivity extends AppCompatActivity {
         etAddress = findViewById(R.id.etAddress);
         etPhone = findViewById(R.id.etPhone);
         btnInsert = findViewById(R.id.btnInsert);
-        btnShow = findViewById(R.id.btnShow);
+        btnShowAll = findViewById(R.id.btnShowAll);
 
-        dbHelper = new DatabaseHelper(this);
+        databaseHelper = new DatabaseHelper(this);
 
+        // Insert Customer
         btnInsert.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -197,22 +185,32 @@ public class MainActivity extends AppCompatActivity {
                 String address = etAddress.getText().toString().trim();
                 String phone = etPhone.getText().toString().trim();
 
-                if (!name.isEmpty() && !address.isEmpty() && !phone.isEmpty()) {
-                    dbHelper.insertCustomer(name, address, phone);
-                    etName.setText("");
-                    etAddress.setText("");
-                    etPhone.setText("");
+                if (name.isEmpty() || address.isEmpty() || phone.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(MainActivity.this, "Fill all fields", Toast.LENGTH_SHORT).show();
+                    boolean inserted = databaseHelper.insertCustomer(name, address, phone);
+                    if (inserted) {
+                        Toast.makeText(MainActivity.this, "Customer Added Successfully", Toast.LENGTH_SHORT).show();
+                        etName.setText("");
+                        etAddress.setText("");
+                        etPhone.setText("");
+                    } else {
+                        Toast.makeText(MainActivity.this, "Error Adding Customer", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
 
-        btnShow.setOnClickListener(new View.OnClickListener() {
+        // Show All Customers
+        btnShowAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String customerData = dbHelper.getAllCustomers();
-                Toast.makeText(MainActivity.this, customerData, Toast.LENGTH_LONG).show();
+                String customers = databaseHelper.getAllCustomers();
+                if (customers.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "No Customers Found", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(MainActivity.this, customers, Toast.LENGTH_LONG).show();
+                }
             }
         });
     }

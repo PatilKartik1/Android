@@ -1,80 +1,3 @@
- MainActivity.java
-
- package com.example.poweraverageapp;
-
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
-
-public class MainActivity extends AppCompatActivity {
-    EditText num1, num2;
-    Button btnCalculate;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        num1 = findViewById(R.id.editTextNumber1);
-        num2 = findViewById(R.id.editTextNumber2);
-        btnCalculate = findViewById(R.id.btnCalculate);
-
-        btnCalculate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (num1.getText().toString().isEmpty() || num2.getText().toString().isEmpty()) {
-                    Toast.makeText(MainActivity.this, "Please enter both numbers", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                double number1 = Double.parseDouble(num1.getText().toString());
-                double number2 = Double.parseDouble(num2.getText().toString());
-
-                double power = Math.pow(number1, number2);
-                double average = (number1 + number2) / 2;
-
-                Intent intent = new Intent(MainActivity.this, ResultActivity.class);
-                intent.putExtra("power", power);
-                intent.putExtra("average", average);
-                startActivity(intent);
-            }
-        });
-    }
-}
-
-
-ResultActivity.java
-
-package com.example.poweraverageapp;
-
-import android.os.Bundle;
-import android.widget.TextView;
-import androidx.appcompat.app.AppCompatActivity;
-
-public class ResultActivity extends AppCompatActivity {
-    TextView textPower, textAverage;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_result);
-
-        textPower = findViewById(R.id.textPower);
-        textAverage = findViewById(R.id.textAverage);
-
-        double power = getIntent().getDoubleExtra("power", 0);
-        double average = getIntent().getDoubleExtra("average", 0);
-
-        textPower.setText("Power: " + power);
-        textAverage.setText("Average: " + average);
-    }
-}
-
-
 activity_main.xml
 
 <?xml version="1.0" encoding="utf-8"?>
@@ -85,26 +8,78 @@ activity_main.xml
     android:padding="20dp">
 
     <EditText
-        android:id="@+id/editTextNumber1"
+        android:id="@+id/etNum1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter First Number"
-        android:inputType="numberDecimal" />
+        android:inputType="numberDecimal"/>
 
     <EditText
-        android:id="@+id/editTextNumber2"
+        android:id="@+id/etNum2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter Second Number"
-        android:inputType="numberDecimal" />
+        android:inputType="numberDecimal"/>
 
     <Button
         android:id="@+id/btnCalculate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Calculate & Show Result" />
+        android:text="Calculate Power & Average"/>
 
 </LinearLayout>
+
+
+MainActivity.java
+
+package com.example.poweraverageapp;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etNum1, etNum2;
+    Button btnCalculate;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etNum1 = findViewById(R.id.etNum1);
+        etNum2 = findViewById(R.id.etNum2);
+        btnCalculate = findViewById(R.id.btnCalculate);
+
+        btnCalculate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String num1Str = etNum1.getText().toString();
+                String num2Str = etNum2.getText().toString();
+
+                if (num1Str.isEmpty() || num2Str.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "Please enter both numbers", Toast.LENGTH_SHORT).show();
+                } else {
+                    double num1 = Double.parseDouble(num1Str);
+                    double num2 = Double.parseDouble(num2Str);
+                    
+                    double power = Math.pow(num1, num2);
+                    double average = (num1 + num2) / 2.0;
+
+                    Intent intent = new Intent(MainActivity.this, ResultActivity.class);
+                    intent.putExtra("power", power);
+                    intent.putExtra("average", average);
+                    startActivity(intent);
+                }
+            }
+        });
+    }
+}
 
 
 activity_result.xml
@@ -117,46 +92,41 @@ activity_result.xml
     android:padding="20dp">
 
     <TextView
-        android:id="@+id/textPower"
+        android:id="@+id/tvResult"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Power:"
-        android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/textAverage"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Average:"
-        android:textSize="20sp" />
-
+        android:text="Results will be displayed here"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:gravity="center"/>
 </LinearLayout>
 
-AndroidManifest.xml
 
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.poweraverageapp">
+ResultActivity.java
 
-    <application
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="Power & Average App"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/Theme.PowerAverageApp">
+package com.example.poweraverageapp;
 
-        <!-- Main Activity -->
-        <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+import android.os.Bundle;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
 
-        <!-- Result Activity -->
-        <activity android:name=".ResultActivity" />
-        
-    </application>
+public class ResultActivity extends AppCompatActivity {
 
-</manifest>
+    TextView tvResult;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_result);
+
+        tvResult = findViewById(R.id.tvResult);
+
+        double power = getIntent().getDoubleExtra("power", 0);
+        double average = getIntent().getDoubleExtra("average", 0);
+
+        String resultText = "Power: " + power + "\nAverage: " + average;
+        tvResult.setText(resultText);
+    }
+}
+
+

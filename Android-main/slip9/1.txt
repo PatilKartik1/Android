@@ -1,3 +1,23 @@
+AndroidManifest.xml
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.numbervalidation">
+
+    <application
+        android:allowBackup="true"
+        android:theme="@style/Theme.NumberValidation">
+
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+    </application>
+</manifest>
+
+
 activity_main.xml
 
 <?xml version="1.0" encoding="utf-8"?>
@@ -11,36 +31,35 @@ activity_main.xml
         android:id="@+id/num1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter First Number"
+        android:hint="Enter first number"
         android:inputType="number"/>
 
     <EditText
         android:id="@+id/num2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter Second Number"
+        android:hint="Enter second number"
         android:inputType="number"/>
 
     <Button
-        android:id="@+id/btnSubmit"
+        android:id="@+id/submitBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Submit"/>
 
     <TextView
-        android:id="@+id/result"
+        android:id="@+id/resultText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Result will appear here"
         android:textSize="18sp"
-        android:paddingTop="20dp"/>
-
+        android:paddingTop="20dp"
+        android:textColor="@android:color/black"/>
+        
 </LinearLayout>
-
 
 MainActivity.java
 
-package com.example.validateinput;
+package com.example.numbervalidation;
 
 import android.os.Bundle;
 import android.view.View;
@@ -52,42 +71,53 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    private EditText num1, num2;
-    private TextView result;
+    EditText num1, num2;
+    Button submitBtn;
+    TextView resultText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Linking UI components
         num1 = findViewById(R.id.num1);
         num2 = findViewById(R.id.num2);
-        Button btnSubmit = findViewById(R.id.btnSubmit);
-        result = findViewById(R.id.result);
+        submitBtn = findViewById(R.id.submitBtn);
+        resultText = findViewById(R.id.resultText);
 
-        btnSubmit.setOnClickListener(v -> validateNumbers());
+        // Button click event
+        submitBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                validateAndDisplay();
+            }
+        });
     }
 
-    private void validateNumbers() {
-        String str1 = num1.getText().toString().trim();
-        String str2 = num2.getText().toString().trim();
+    private void validateAndDisplay() {
+        // Get values from input fields
+        String strNum1 = num1.getText().toString();
+        String strNum2 = num2.getText().toString();
 
-        if (str1.isEmpty() || str2.isEmpty()) {
+        // Check if fields are empty
+        if (strNum1.isEmpty() || strNum2.isEmpty()) {
             Toast.makeText(this, "Please enter both numbers", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        int number1 = Integer.parseInt(str1);
-        int number2 = Integer.parseInt(str2);
+        // Convert to integers
+        int number1 = Integer.parseInt(strNum1);
+        int number2 = Integer.parseInt(strNum2);
 
+        // Condition check
         if (number1 > 10 && number2 > 10) {
-            Toast.makeText(this, "Both numbers are greater than 10! Please enter new numbers.", Toast.LENGTH_LONG).show();
-            num1.setText("");
+            Toast.makeText(this, "Both numbers are greater than 10. Enter new numbers!", Toast.LENGTH_LONG).show();
+            num1.setText("");  // Clear input fields
             num2.setText("");
         } else {
-            result.setText("You entered: " + number1 + " and " + number2);
+            resultText.setText("Entered Numbers: " + number1 + " & " + number2);
         }
     }
 }
-
 

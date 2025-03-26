@@ -1,48 +1,81 @@
+AndroidManifest.xml
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.studentinfo">
+
+    <application
+        android:allowBackup="true"
+        android:theme="@style/Theme.StudentInfo">
+
+        <activity android:name=".SecondActivity"/>
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+    </application>
+</manifest>
+
+
 activity_main.xml
 
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="20dp">
+    android:layout_height="match_parent">
 
-    <EditText android:id="@+id/etFirstName"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="First Name"/>
+        android:padding="20dp"
+        android:orientation="vertical">
 
-    <EditText android:id="@+id/etMiddleName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Middle Name"/>
+        <EditText
+            android:id="@+id/etFirstName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="First Name"/>
 
-    <EditText android:id="@+id/etLastName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Last Name"/>
+        <EditText
+            android:id="@+id/etMiddleName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Middle Name"/>
 
-    <EditText android:id="@+id/etDOB"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Date of Birth"/>
+        <EditText
+            android:id="@+id/etLastName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Last Name"/>
 
-    <EditText android:id="@+id/etAddress"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Address"/>
+        <EditText
+            android:id="@+id/etDOB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Date of Birth (DD/MM/YYYY)"/>
 
-    <EditText android:id="@+id/etEmail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Email ID"/>
+        <EditText
+            android:id="@+id/etAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Address"/>
 
-    <Button android:id="@+id/btnSubmit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Submit"/>
+        <EditText
+            android:id="@+id/etEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Email ID"/>
 
-</LinearLayout>
+        <Button
+            android:id="@+id/btnSubmit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Submit"/>
+
+    </LinearLayout>
+</ScrollView>
 
 
 MainActivity.java
@@ -51,6 +84,7 @@ package com.example.studentinfo;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
@@ -58,22 +92,25 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity {
 
     private EditText etFirstName, etMiddleName, etLastName, etDOB, etAddress, etEmail;
+    private Button btnSubmit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Initialize UI elements
         etFirstName = findViewById(R.id.etFirstName);
         etMiddleName = findViewById(R.id.etMiddleName);
         etLastName = findViewById(R.id.etLastName);
         etDOB = findViewById(R.id.etDOB);
         etAddress = findViewById(R.id.etAddress);
         etEmail = findViewById(R.id.etEmail);
-        Button btnSubmit = findViewById(R.id.btnSubmit);
+        btnSubmit = findViewById(R.id.btnSubmit);
 
+        // Button click event to pass data
         btnSubmit.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, DisplayActivity.class);
+            Intent intent = new Intent(MainActivity.this, SecondActivity.class);
             intent.putExtra("firstName", etFirstName.getText().toString());
             intent.putExtra("middleName", etMiddleName.getText().toString());
             intent.putExtra("lastName", etLastName.getText().toString());
@@ -86,24 +123,31 @@ public class MainActivity extends AppCompatActivity {
 }
 
 
-activity_display.xml
+activity_second.xml
 
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="20dp">
+    android:layout_height="match_parent">
 
-    <TextView android:id="@+id/tvStudentInfo"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="18sp"/>
+        android:padding="20dp"
+        android:orientation="vertical">
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/tvDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:padding="10dp"/>
+
+    </LinearLayout>
+</ScrollView>
 
 
-DisplayActivity.java
+SecondActivity.java
 
 package com.example.studentinfo;
 
@@ -111,23 +155,35 @@ import android.os.Bundle;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class DisplayActivity extends AppCompatActivity {
+public class SecondActivity extends AppCompatActivity {
+
+    private TextView tvDetails;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_display);
+        setContentView(R.layout.activity_second);
 
-        TextView tvStudentInfo = findViewById(R.id.tvStudentInfo);
+        tvDetails = findViewById(R.id.tvDetails);
 
-        String studentData = "Name: " + getIntent().getStringExtra("firstName") + " " +
-                getIntent().getStringExtra("middleName") + " " +
-                getIntent().getStringExtra("lastName") + "\n" +
-                "DOB: " + getIntent().getStringExtra("dob") + "\n" +
-                "Address: " + getIntent().getStringExtra("address") + "\n" +
-                "Email: " + getIntent().getStringExtra("email");
+        // Retrieve Data from Intent
+        String firstName = getIntent().getStringExtra("firstName");
+        String middleName = getIntent().getStringExtra("middleName");
+        String lastName = getIntent().getStringExtra("lastName");
+        String dob = getIntent().getStringExtra("dob");
+        String address = getIntent().getStringExtra("address");
+        String email = getIntent().getStringExtra("email");
 
-        tvStudentInfo.setText(studentData);
+        // Display Data
+        String details = "Student Details:\n\n" +
+                "First Name: " + firstName + "\n" +
+                "Middle Name: " + middleName + "\n" +
+                "Last Name: " + lastName + "\n" +
+                "Date of Birth: " + dob + "\n" +
+                "Address: " + address + "\n" +
+                "Email ID: " + email;
+
+        tvDetails.setText(details);
     }
 }
 

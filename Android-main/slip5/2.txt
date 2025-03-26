@@ -1,23 +1,20 @@
 activity_main.xml
 
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout 
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
     android:padding="20dp">
 
     <Button
         android:id="@+id/btnShowDialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Show Friends List"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:text="Show Friends List"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
 
 
 MainActivity.java
@@ -25,6 +22,7 @@ MainActivity.java
 package com.example.customalertdialog;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
@@ -35,7 +33,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity {
 
     Button btnShowDialog;
-    String[] friends = {"Alice", "Bob", "Charlie", "David", "Emma"};
+    String[] friends = {"Alice", "Bob", "Charlie", "David"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,20 +45,20 @@ public class MainActivity extends AppCompatActivity {
         btnShowDialog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showCustomDialog();
+                showFriendsDialog(MainActivity.this);
             }
         });
     }
 
-    private void showCustomDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    private void showFriendsDialog(Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Select a Friend");
 
         builder.setItems(friends, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String selectedFriend = friends[which];
-                Toast.makeText(MainActivity.this, "Hello, " + selectedFriend + "!", Toast.LENGTH_SHORT).show();
+                String friendName = friends[which];
+                Toast.makeText(context, "Hello, " + friendName + "!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -71,8 +69,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 }
 

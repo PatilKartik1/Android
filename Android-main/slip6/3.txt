@@ -1,11 +1,18 @@
+build.gradle (Module: app)
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+}
+
+
 DatabaseHelper.java
 
-package com.example.studentdatabase;
+package com.example.studentapp;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -16,7 +23,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_NAME = "Student";
     private static final String COLUMN_ID = "Sid";
     private static final String COLUMN_NAME = "Sname";
-    private static final String COLUMN_PHONE = "Phno";
+    private static final String COLUMN_PHONE = "phno";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -37,7 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    // Insert a new student
+    // Insert Student
     public boolean addStudent(String name, String phone) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -48,108 +55,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result != -1;
     }
 
-    // Retrieve all students
-    public Cursor getAllStudents() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
-    }
-
-    // Delete a student by ID
+    // Delete Student
     public boolean deleteStudent(int id) {
         SQLiteDatabase db = this.getWritableDatabase();
         int result = db.delete(TABLE_NAME, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
         db.close();
         return result > 0;
     }
-}
 
-
-MainActivity.java
-
-package com.example.studentdatabase;
-
-import android.database.Cursor;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.*;
-import androidx.appcompat.app.AppCompatActivity;
-import java.util.ArrayList;
-
-public class MainActivity extends AppCompatActivity {
-
-    private EditText nameInput, phoneInput, deleteIdInput;
-    private Button addButton, deleteButton;
-    private ListView listView;
-    private DatabaseHelper dbHelper;
-    private ArrayAdapter<String> adapter;
-    private ArrayList<String> studentList;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        nameInput = findViewById(R.id.nameInput);
-        phoneInput = findViewById(R.id.phoneInput);
-        deleteIdInput = findViewById(R.id.deleteIdInput);
-        addButton = findViewById(R.id.addButton);
-        deleteButton = findViewById(R.id.deleteButton);
-        listView = findViewById(R.id.listView);
-        dbHelper = new DatabaseHelper(this);
-
-        studentList = new ArrayList<>();
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, studentList);
-        listView.setAdapter(adapter);
-
-        loadStudents();
-
-        addButton.setOnClickListener(v -> {
-            String name = nameInput.getText().toString();
-            String phone = phoneInput.getText().toString();
-            if (!name.isEmpty() && !phone.isEmpty()) {
-                if (dbHelper.addStudent(name, phone)) {
-                    Toast.makeText(this, "Student Added!", Toast.LENGTH_SHORT).show();
-                    loadStudents();
-                    nameInput.setText("");
-                    phoneInput.setText("");
-                } else {
-                    Toast.makeText(this, "Failed to Add!", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(this, "Enter Name and Phone!", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        deleteButton.setOnClickListener(v -> {
-            String idText = deleteIdInput.getText().toString();
-            if (!idText.isEmpty()) {
-                int id = Integer.parseInt(idText);
-                if (dbHelper.deleteStudent(id)) {
-                    Toast.makeText(this, "Student Deleted!", Toast.LENGTH_SHORT).show();
-                    loadStudents();
-                    deleteIdInput.setText("");
-                } else {
-                    Toast.makeText(this, "ID Not Found!", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(this, "Enter Student ID!", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void loadStudents() {
-        studentList.clear();
-        Cursor cursor = dbHelper.getAllStudents();
-        if (cursor.moveToFirst()) {
-            do {
-                int id = cursor.getInt(0);
-                String name = cursor.getString(1);
-                String phone = cursor.getString(2);
-                studentList.add(id + ". " + name + " - " + phone);
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
-        adapter.notifyDataSetChanged();
+    // Get All Students
+    public Cursor getAllStudents() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
     }
 }
 
@@ -160,53 +77,143 @@ activity_main.xml
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="20dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="20dp">
 
     <EditText
-        android:id="@+id/nameInput"
+        android:id="@+id/etName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter Student Name"/>
 
     <EditText
-        android:id="@+id/phoneInput"
+        android:id="@+id/etPhone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter Phone Number"
         android:inputType="phone"/>
 
     <Button
-        android:id="@+id/addButton"
+        android:id="@+id/btnAdd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Add Student"/>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Delete Student by ID"
-        android:textSize="16sp"
-        android:paddingTop="10dp"/>
-
     <EditText
-        android:id="@+id/deleteIdInput"
+        android:id="@+id/etDeleteId"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter Student ID"
-        android:inputType="number"/>
+        android:hint="Enter Student ID to Delete"/>
 
     <Button
-        android:id="@+id/deleteButton"
+        android:id="@+id/btnDelete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Delete Student"/>
 
-    <ListView
-        android:id="@+id/listView"
+    <TextView
+        android:id="@+id/tvStudents"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:text="Students List:"/>
 </LinearLayout>
+
+MainActivity.java
+
+package com.example.studentapp;
+
+import android.database.Cursor;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    DatabaseHelper db;
+    EditText etName, etPhone, etDeleteId;
+    TextView tvStudents;
+    Button btnAdd, btnDelete;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        db = new DatabaseHelper(this);
+        etName = findViewById(R.id.etName);
+        etPhone = findViewById(R.id.etPhone);
+        etDeleteId = findViewById(R.id.etDeleteId);
+        tvStudents = findViewById(R.id.tvStudents);
+        btnAdd = findViewById(R.id.btnAdd);
+        btnDelete = findViewById(R.id.btnDelete);
+
+        displayStudents();
+
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String name = etName.getText().toString();
+                String phone = etPhone.getText().toString();
+
+                if (name.isEmpty() || phone.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "Please enter all fields", Toast.LENGTH_SHORT).show();
+                } else {
+                    boolean isInserted = db.addStudent(name, phone);
+                    if (isInserted) {
+                        Toast.makeText(MainActivity.this, "Student Added", Toast.LENGTH_SHORT).show();
+                        etName.setText("");
+                        etPhone.setText("");
+                        displayStudents();
+                    } else {
+                        Toast.makeText(MainActivity.this, "Error Adding Student", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String idText = etDeleteId.getText().toString();
+                if (idText.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "Enter Student ID to delete", Toast.LENGTH_SHORT).show();
+                } else {
+                    int id = Integer.parseInt(idText);
+                    boolean isDeleted = db.deleteStudent(id);
+                    if (isDeleted) {
+                        Toast.makeText(MainActivity.this, "Student Deleted", Toast.LENGTH_SHORT).show();
+                        etDeleteId.setText("");
+                        displayStudents();
+                    } else {
+                        Toast.makeText(MainActivity.this, "Student Not Found", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+    }
+
+    private void displayStudents() {
+        Cursor cursor = db.getAllStudents();
+        StringBuilder builder = new StringBuilder("Students List:\n");
+
+        if (cursor.getCount() == 0) {
+            builder.append("No Students Found");
+        } else {
+            while (cursor.moveToNext()) {
+                builder.append("ID: ").append(cursor.getInt(0)).append("\n");
+                builder.append("Name: ").append(cursor.getString(1)).append("\n");
+                builder.append("Phone: ").append(cursor.getString(2)).append("\n\n");
+            }
+        }
+
+        tvStudents.setText(builder.toString());
+        cursor.close();
+    }
+}
 
 
