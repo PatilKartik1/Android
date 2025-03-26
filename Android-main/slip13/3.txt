@@ -1,0 +1,159 @@
+AndroidManifest.xml
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.teachermanagement">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <application
+        android:allowBackup="true"
+        android:theme="@style/Theme.TeacherManagement">
+        
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
+
+
+activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/etTeacherName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Teacher Name"/>
+
+    <Button
+        android:id="@+id/btnSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Find Students"/>
+
+    <TextView
+        android:id="@+id/tvResult"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:padding="10dp"/>
+
+</LinearLayout>
+
+
+DatabaseHelper.java
+
+package com.example.teachermanagement;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+public class DatabaseHelper extends SQLiteOpenHelper {
+
+    private static final String DATABASE_NAME = "SchoolDB";
+    private static final int DATABASE_VERSION = 1;
+
+    public DatabaseHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE Student (sno INTEGER PRIMARY KEY, s_name TEXT, s_class TEXT, s_addr TEXT)");
+        db.execSQL("CREATE TABLE Teacher (tno INTEGER PRIMARY KEY, t_name TEXT, qualification TEXT, experience INTEGER)");
+        db.execSQL("CREATE TABLE StudentTeacher (sno INTEGER, tno INTEGER, subject TEXT, PRIMARY KEY(sno, tno))");
+
+        // Insert sample data
+        db.execSQL("INSERT INTO Teacher VALUES (1, 'Mr. Sharma', 'M.Sc', 10)");
+        db.execSQL("INSERT INTO Teacher VALUES (2, 'Ms. Gupta', 'Ph.D', 8)");
+
+        db.execSQL("INSERT INTO Student VALUES (101, 'Rahul', '10th', 'Delhi')");
+        db.execSQL("INSERT INTO Student VALUES (102, 'Priya', '9th', 'Mumbai')");
+
+        db.execSQL("INSERT INTO StudentTeacher VALUES (101, 1, 'Mathematics')");
+        db.execSQL("INSERT INTO StudentTeacher VALUES (102, 2, 'Physics')");
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS Student");
+        db.execSQL("DROP TABLE IF EXISTS Teacher");
+        db.execSQL("DROP TABLE IF EXISTS StudentTeacher");
+        onCreate(db);
+    }
+
+    public String getStudentsByTeacher(String teacherName) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String result = "";
+
+        String query = "SELECT s.s_name, st.subject FROM Student s " +
+                "JOIN StudentTeacher st ON s.sno = st.sno " +
+                "JOIN Teacher t ON t.tno = st.tno " +
+                "WHERE t.t_name = ?";
+        
+        Cursor cursor = db.rawQuery(query, new String[]{teacherName});
+
+        while (cursor.moveToNext()) {
+            result += "Student: " + cursor.getString(0) + " | Subject: " + cursor.getString(1) + "\n";
+        }
+        cursor.close();
+        return result.isEmpty() ? "No students found." : result;
+    }
+}
+
+
+MainActivity.java
+
+package com.example.teachermanagement;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    private EditText etTeacherName;
+    private Button btnSearch;
+    private TextView tvResult;
+    private DatabaseHelper dbHelper;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etTeacherName = findViewById(R.id.etTeacherName);
+        btnSearch = findViewById(R.id.btnSearch);
+        tvResult = findViewById(R.id.tvResult);
+        dbHelper = new DatabaseHelper(this);
+
+        btnSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String teacherName = etTeacherName.getText().toString().trim();
+                if (!teacherName.isEmpty()) {
+                    String result = dbHelper.getStudentsByTeacher(teacherName);
+                    tvResult.setText(result);
+                } else {
+                    tvResult.setText("Please enter a teacher name.");
+                }
+            }
+        });
+    }
+}
+
+

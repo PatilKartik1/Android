@@ -1,0 +1,68 @@
+activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Coffee?"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="10dp"/>
+
+    <Spinner
+        android:id="@+id/spinner_coffee"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:spinnerMode="dropdown"/>
+</LinearLayout>
+
+
+res/layout/spinner_item.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textSize="18sp"
+    android:padding="10dp"
+    android:textColor="@android:color/black"/>
+
+
+MainActivity.java
+
+package com.example.spinnerstyledemo;
+
+import android.os.Bundle;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // Spinner Reference
+        Spinner spinner = findViewById(R.id.spinner_coffee);
+
+        // Coffee List
+        String[] coffeeTypes = {"Filter", "Americano", "Latte", "Espresso", "Cappuccino", "Mocha", "Skinny Latte", "Espresso Corretto"};
+
+        // Adapter with Custom Layout
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, coffeeTypes);
+        adapter.setDropDownViewResource(R.layout.spinner_item);
+
+        // Set Adapter to Spinner
+        spinner.setAdapter(adapter);
+    }
+}
+
+
