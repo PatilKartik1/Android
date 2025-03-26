@@ -1,0 +1,174 @@
+activity_main.xml 
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="#D3D3D3"
+    android:padding="20dp">
+
+    <TextView
+        android:id="@+id/tvDisplay"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="#FFFFFF"
+        android:textSize="30sp"
+        android:gravity="end|center_vertical"
+        android:padding="20dp"
+        android:text="0" />
+
+    <GridLayout
+        android:id="@+id/gridLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="4"
+        android:rowCount="5"
+        android:padding="10dp"
+        android:layout_marginTop="20dp">
+
+        <!-- Calculator Buttons -->
+        <Button android:text="AC" android:id="@+id/btnClear"/>
+        <Button android:text="+/-" android:id="@+id/btnSign"/>
+        <Button android:text="/" android:id="@+id/btnDivide"/>
+        <Button android:text="*" android:id="@+id/btnMultiply"/>
+
+        <Button android:text="7" android:id="@+id/btn7"/>
+        <Button android:text="8" android:id="@+id/btn8"/>
+        <Button android:text="9" android:id="@+id/btn9"/>
+        <Button android:text="-" android:id="@+id/btnSubtract"/>
+
+        <Button android:text="4" android:id="@+id/btn4"/>
+        <Button android:text="5" android:id="@+id/btn5"/>
+        <Button android:text="6" android:id="@+id/btn6"/>
+        <Button android:text="+" android:id="@+id/btnAdd"/>
+
+        <Button android:text="1" android:id="@+id/btn1"/>
+        <Button android:text="2" android:id="@+id/btn2"/>
+        <Button android:text="3" android:id="@+id/btn3"/>
+        <Button android:text="%" android:id="@+id/btnMod"/>
+
+        <Button android:text="0" android:id="@+id/btn0" android:layout_columnSpan="2"/>
+        <Button android:text="." android:id="@+id/btnDot"/>
+        <Button android:text="=" android:id="@+id/btnEquals"/>
+    </GridLayout>
+
+</LinearLayout>
+
+
+MainActivity.java
+
+package com.example.simplecalculator;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+    TextView tvDisplay;
+    String currentInput = "";
+    String operator = "";
+    double firstNumber = 0;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        tvDisplay = findViewById(R.id.tvDisplay);
+
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Button btn = (Button) v;
+                String buttonText = btn.getText().toString();
+                handleButtonClick(buttonText);
+            }
+        };
+
+        int[] buttonIds = {
+                R.id.btn0, R.id.btn1, R.id.btn2, R.id.btn3, R.id.btn4, R.id.btn5, R.id.btn6, R.id.btn7, R.id.btn8, R.id.btn9,
+                R.id.btnAdd, R.id.btnSubtract, R.id.btnMultiply, R.id.btnDivide, R.id.btnMod,
+                R.id.btnDot, R.id.btnClear, R.id.btnEquals, R.id.btnSign
+        };
+
+        for (int id : buttonIds) {
+            findViewById(id).setOnClickListener(listener);
+        }
+    }
+
+    private void handleButtonClick(String buttonText) {
+        switch (buttonText) {
+            case "AC":
+                currentInput = "";
+                operator = "";
+                firstNumber = 0;
+                tvDisplay.setText("0");
+                break;
+
+            case "+/-":
+                if (!currentInput.isEmpty()) {
+                    double value = Double.parseDouble(currentInput) * -1;
+                    currentInput = String.valueOf(value);
+                    tvDisplay.setText(currentInput);
+                }
+                break;
+
+            case "+":
+            case "-":
+            case "*":
+            case "/":
+            case "%":
+                if (!currentInput.isEmpty()) {
+                    firstNumber = Double.parseDouble(currentInput);
+                    operator = buttonText;
+                    currentInput = "";
+                }
+                break;
+
+            case "=":
+                if (!currentInput.isEmpty() && !operator.isEmpty()) {
+                    double secondNumber = Double.parseDouble(currentInput);
+                    double result = 0;
+                    switch (operator) {
+                        case "+": result = firstNumber + secondNumber; break;
+                        case "-": result = firstNumber - secondNumber; break;
+                        case "*": result = firstNumber * secondNumber; break;
+                        case "/": result = firstNumber / secondNumber; break;
+                        case "%": result = firstNumber % secondNumber; break;
+                    }
+                    tvDisplay.setText(String.valueOf(result));
+                    currentInput = String.valueOf(result);
+                    operator = "";
+                }
+                break;
+
+            default:
+                currentInput += buttonText;
+                tvDisplay.setText(currentInput);
+                break;
+        }
+    }
+}
+
+
+AndroidManifest.xml 
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.simplecalculator">
+    <application
+        android:allowBackup="true"
+        android:theme="@style/Theme.SimpleCalculator">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
+
+
