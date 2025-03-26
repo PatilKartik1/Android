@@ -1,0 +1,63 @@
+AndroidManifest.xml
+
+<uses-permission android:name="android.permission.WRITE_CONTACTS"/>
+
+
+activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="20dp">
+
+    <Button
+        android:id="@+id/btnInsertContact"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Insert Contact"
+        android:padding="10dp"/>
+        
+</LinearLayout>
+
+
+MainActivity.java
+
+package com.example.insertcontact;
+
+import android.content.ContentValues;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.widget.Button;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        Button btnInsertContact = findViewById(R.id.btnInsertContact);
+
+        btnInsertContact.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_INSERT);
+            intent.setType(ContactsContract.Contacts.CONTENT_TYPE);
+
+            // Pre-fill Contact Information
+            intent.putExtra(ContactsContract.Intents.Insert.NAME, "John Doe");
+            intent.putExtra(ContactsContract.Intents.Insert.PHONE, "6502530000");
+            intent.putExtra(ContactsContract.Intents.Insert.EMAIL, "johndoe@example.com");
+            intent.putExtra(ContactsContract.Intents.Insert.PHONE_TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE);
+
+            // Start Contact Insert Activity
+            startActivity(intent);
+        });
+    }
+}
+
+

@@ -1,0 +1,94 @@
+ activity_main.xml
+
+ <?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:id="@+id/tvSampleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello, Android!"
+        android:textSize="20sp"
+        android:textColor="#000000"
+        android:typeface="sans"
+        android:padding="10dp"/>
+
+    <Button
+        android:id="@+id/btnIncreaseSize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Increase Font Size"/>
+
+    <Button
+        android:id="@+id/btnChangeColor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Change Font Color"/>
+
+    <Button
+        android:id="@+id/btnChangeFont"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Change Font Style"/>
+
+</LinearLayout>
+
+
+MainActivity.java
+
+package com.example.fontchanger;
+
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    private TextView tvSampleText;
+    private float currentFontSize = 20f;
+    private boolean isBold = false;
+    private boolean isColorChanged = false;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        tvSampleText = findViewById(R.id.tvSampleText);
+        Button btnIncreaseSize = findViewById(R.id.btnIncreaseSize);
+        Button btnChangeColor = findViewById(R.id.btnChangeColor);
+        Button btnChangeFont = findViewById(R.id.btnChangeFont);
+
+        btnIncreaseSize.setOnClickListener(v -> {
+            currentFontSize += 5;
+            tvSampleText.setTextSize(currentFontSize);
+        });
+
+        btnChangeColor.setOnClickListener(v -> {
+            if (isColorChanged) {
+                tvSampleText.setTextColor(Color.BLACK);
+            } else {
+                tvSampleText.setTextColor(Color.RED);
+            }
+            isColorChanged = !isColorChanged;
+        });
+
+        btnChangeFont.setOnClickListener(v -> {
+            if (isBold) {
+                tvSampleText.setTypeface(Typeface.SANS_SERIF, Typeface.NORMAL);
+            } else {
+                tvSampleText.setTypeface(Typeface.SERIF, Typeface.BOLD);
+            }
+            isBold = !isBold;
+        });
+    }
+}
+
+

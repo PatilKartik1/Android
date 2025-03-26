@@ -1,0 +1,121 @@
+//Get a Google Maps API Key:
+//Go to Google Cloud Console
+//Enable Google Maps SDK for Android
+//Get your API Key
+
+AndroidManifest.xml
+
+<manifest>
+    <application>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="YOUR_API_KEY_HERE"/>
+    </application>
+</manifest>
+
+
+MapActivity.java
+
+package com.example.mapzoomapp;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import androidx.appcompat.app.AppCompatActivity;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
+
+    private GoogleMap mMap;
+    private Button zoomInButton, zoomOutButton;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_map);
+
+        // Get map fragment
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        }
+
+        zoomInButton = findViewById(R.id.zoomIn);
+        zoomOutButton = findViewById(R.id.zoomOut);
+
+        // Zoom In
+        zoomInButton.setOnClickListener(v -> {
+            if (mMap != null) {
+                mMap.animateCamera(CameraUpdateFactory.zoomIn());
+            }
+        });
+
+        // Zoom Out
+        zoomOutButton.setOnClickListener(v -> {
+            if (mMap != null) {
+                mMap.animateCamera(CameraUpdateFactory.zoomOut());
+            }
+        });
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        
+        // Set default location (Current Location)
+        LatLng myLocation = new LatLng(-34, 151);  // Example: Sydney
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 10));
+
+        // Enable Satellite View
+        mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+    }
+}
+
+
+activity_map.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Google Map -->
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Zoom In Button -->
+    <Button
+        android:id="@+id/zoomIn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Zoom In"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10dp"
+        android:layout_alignParentStart="true"/>
+
+    <!-- Zoom Out Button -->
+    <Button
+        android:id="@+id/zoomOut"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Zoom Out"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10dp"
+        android:layout_alignParentEnd="true"/>
+
+</RelativeLayout>
+
+
+build.gradle (Module: app)
+
+dependencies {
+    implementation 'com.google.android.gms:play-services-maps:18.1.0'
+}

@@ -1,0 +1,134 @@
+activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <EditText android:id="@+id/etFirstName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="First Name"/>
+
+    <EditText android:id="@+id/etMiddleName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Middle Name"/>
+
+    <EditText android:id="@+id/etLastName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Last Name"/>
+
+    <EditText android:id="@+id/etDOB"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Date of Birth"/>
+
+    <EditText android:id="@+id/etAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Address"/>
+
+    <EditText android:id="@+id/etEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Email ID"/>
+
+    <Button android:id="@+id/btnSubmit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Submit"/>
+
+</LinearLayout>
+
+
+MainActivity.java
+
+package com.example.studentinfo;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.EditText;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    private EditText etFirstName, etMiddleName, etLastName, etDOB, etAddress, etEmail;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etFirstName = findViewById(R.id.etFirstName);
+        etMiddleName = findViewById(R.id.etMiddleName);
+        etLastName = findViewById(R.id.etLastName);
+        etDOB = findViewById(R.id.etDOB);
+        etAddress = findViewById(R.id.etAddress);
+        etEmail = findViewById(R.id.etEmail);
+        Button btnSubmit = findViewById(R.id.btnSubmit);
+
+        btnSubmit.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, DisplayActivity.class);
+            intent.putExtra("firstName", etFirstName.getText().toString());
+            intent.putExtra("middleName", etMiddleName.getText().toString());
+            intent.putExtra("lastName", etLastName.getText().toString());
+            intent.putExtra("dob", etDOB.getText().toString());
+            intent.putExtra("address", etAddress.getText().toString());
+            intent.putExtra("email", etEmail.getText().toString());
+            startActivity(intent);
+        });
+    }
+}
+
+
+activity_display.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView android:id="@+id/tvStudentInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"/>
+
+</LinearLayout>
+
+
+DisplayActivity.java
+
+package com.example.studentinfo;
+
+import android.os.Bundle;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class DisplayActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_display);
+
+        TextView tvStudentInfo = findViewById(R.id.tvStudentInfo);
+
+        String studentData = "Name: " + getIntent().getStringExtra("firstName") + " " +
+                getIntent().getStringExtra("middleName") + " " +
+                getIntent().getStringExtra("lastName") + "\n" +
+                "DOB: " + getIntent().getStringExtra("dob") + "\n" +
+                "Address: " + getIntent().getStringExtra("address") + "\n" +
+                "Email: " + getIntent().getStringExtra("email");
+
+        tvStudentInfo.setText(studentData);
+    }
+}
+
+

@@ -1,0 +1,81 @@
+Add Bulb Images to res/drawable Folder
+
+AndroidManifest.xml 
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.bulbtoggle">
+
+    <application
+        android:allowBackup="true"
+        android:theme="@style/Theme.AppCompat.Light"
+        android:label="Bulb Toggle">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
+
+activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="20dp">
+
+    <ImageView
+        android:id="@+id/bulbImage"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:src="@drawable/bulb_off"
+        android:scaleType="centerCrop" />
+
+    <ToggleButton
+        android:id="@+id/toggleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textOn="Turn OFF"
+        android:textOff="Turn ON"
+        android:layout_marginTop="20dp" />
+</LinearLayout>
+
+
+MainActivity.java
+
+package com.example.bulbtoggle;
+
+import android.os.Bundle;
+import android.widget.ImageView;
+import android.widget.ToggleButton;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    private ImageView bulbImage;
+    private ToggleButton toggleButton;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        bulbImage = findViewById(R.id.bulbImage);
+        toggleButton = findViewById(R.id.toggleButton);
+
+        // Toggle Button Listener
+        toggleButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                bulbImage.setImageResource(R.drawable.bulb_on);
+            } else {
+                bulbImage.setImageResource(R.drawable.bulb_off);
+            }
+        });
+    }
+}
+
+

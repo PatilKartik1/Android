@@ -1,0 +1,90 @@
+Adding Images in res/drawable Folder
+Place two images (image1.png and image2.png) in the res/drawable/ directory.
+Example: res/drawable/image1.png
+Example: res/drawable/image2.png
+
+AndroidManifest.xml
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.imagechanger">
+
+    <application
+        android:allowBackup="true"
+        android:theme="@style/Theme.AppCompat.Light"
+        android:label="Image Changer">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
+
+
+activity_main.xml
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="20dp">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:src="@drawable/image1"
+        android:scaleType="centerCrop" />
+
+    <Button
+        android:id="@+id/changeImageBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Change Image"
+        android:layout_marginTop="20dp" />
+</LinearLayout>
+
+
+
+MainActivity.java
+
+package com.example.imagechanger;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    private ImageView imageView;
+    private Button changeImageBtn;
+    private boolean isImage1 = true; // Track which image is displayed
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        imageView = findViewById(R.id.imageView);
+        changeImageBtn = findViewById(R.id.changeImageBtn);
+
+        changeImageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isImage1) {
+                    imageView.setImageResource(R.drawable.image2);
+                } else {
+                    imageView.setImageResource(R.drawable.image1);
+                }
+                isImage1 = !isImage1; // Toggle image state
+            }
+        });
+    }
+}
+

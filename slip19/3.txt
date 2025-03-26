@@ -1,0 +1,184 @@
+AndroidManifest.xml
+
+<uses-permission android:name="android.permission.SEND_SMS"/>
+<uses-permission android:name="android.permission.RECEIVE_SMS"/>
+<uses-permission android:name="android.permission.READ_SMS"/>
+
+
+activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <EditText
+        android:id="@+id/phoneNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter phone number"
+        android:inputType="phone" />
+
+    <EditText
+        android:id="@+id/messageText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter message"
+        android:inputType="textMultiLine" />
+
+    <Button
+        android:id="@+id/sendButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send SMS" />
+
+    <TextView
+        android:id="@+id/statusMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Status: Waiting..."
+        android:textStyle="bold"
+        android:paddingTop="10dp"/>
+</LinearLayout>
+
+
+MainActivity.java
+
+package com.example.smsapp;
+
+import android.Manifest;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.telephony.SmsManager;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+public class MainActivity extends AppCompatActivity {
+
+    private static final int SMS_PERMISSION_CODE = 1;
+    private EditText phoneNumber, messageText;
+    private Button sendButton;
+    private TextView statusMessage;
+    
+    private final String SENT = "SMS_SENT";
+    private final String DELIVERED = "SMS_DELIVERED";
+    
+    private BroadcastReceiver sentReceiver, deliveredReceiver;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        phoneNumber = findViewById(R.id.phoneNumber);
+        messageText = findViewById(R.id.messageText);
+        sendButton = findViewById(R.id.sendButton);
+        statusMessage = findViewById(R.id.statusMessage);
+
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED) {
+                    sendSMS();
+                } else {
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.SEND_SMS}, SMS_PERMISSION_CODE);
+                }
+            }
+        });
+    }
+
+    private void sendSMS() {
+        String phone = phoneNumber.getText().toString();
+        String message = messageText.getText().toString();
+
+        if (phone.isEmpty() || message.isEmpty()) {
+            Toast.makeText(this, "Enter phone number and message!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        SmsManager smsManager = SmsManager.getDefault();
+
+        // PendingIntents for Sent and Delivery reports
+        PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT), PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0, new Intent(DELIVERED), PendingIntent.FLAG_IMMUTABLE);
+
+        smsManager.sendTextMessage(phone, null, message, sentPI, deliveredPI);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Sent Broadcast Receiver
+        sentReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                switch (getResultCode()) {
+                    case RESULT_OK:
+                        statusMessage.setText("Status: SMS Sent Successfully!");
+                        break;
+                    case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+                        statusMessage.setText("Status: Sending Failed!");
+                        break;
+                    case SmsManager.RESULT_ERROR_NO_SERVICE:
+                        statusMessage.setText("Status: No Service Available!");
+                        break;
+                    case SmsManager.RESULT_ERROR_NULL_PDU:
+                        statusMessage.setText("Status: Null PDU Error!");
+                        break;
+                    case SmsManager.RESULT_ERROR_RADIO_OFF:
+                        statusMessage.setText("Status: Radio Off!");
+                        break;
+                }
+            }
+        };
+
+        // Delivery Broadcast Receiver
+        deliveredReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                statusMessage.setText("Status: SMS Delivered!");
+            }
+        };
+
+        // Register the receivers
+        registerReceiver(sentReceiver, new IntentFilter(SENT));
+        registerReceiver(deliveredReceiver, new IntentFilter(DELIVERED));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(sentReceiver);
+        unregisterReceiver(deliveredReceiver);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == SMS_PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                sendSMS();
+            } else {
+                Toast.makeText(this, "SMS Permission Denied!", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+}
+
+

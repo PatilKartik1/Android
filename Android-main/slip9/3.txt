@@ -1,0 +1,190 @@
+DatabaseHelper.java
+
+package com.example.companydatabase;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+public class DatabaseHelper extends SQLiteOpenHelper {
+
+    private static final String DATABASE_NAME = "CompanyDB";
+    private static final String TABLE_NAME = "Company";
+    private static final String COL_ID = "id";
+    private static final String COL_NAME = "name";
+    private static final String COL_ADDRESS = "address";
+    private static final String COL_PHONE = "phno";
+
+    public DatabaseHelper(Context context) {
+        super(context, DATABASE_NAME, null, 1);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        String createTable = "CREATE TABLE " + TABLE_NAME + " (" +
+                COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_NAME + " TEXT, " +
+                COL_ADDRESS + " TEXT, " +
+                COL_PHONE + " TEXT)";
+        db.execSQL(createTable);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        onCreate(db);
+    }
+
+    public boolean insertCompany(String name, String address, String phone) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_NAME, name);
+        values.put(COL_ADDRESS, address);
+        values.put(COL_PHONE, phone);
+
+        long result = db.insert(TABLE_NAME, null, values);
+        return result != -1; // Returns true if insertion is successful
+    }
+
+    public Cursor getAllCompanies() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+    }
+}
+
+
+activity_main.xml)
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <EditText
+        android:id="@+id/etName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Company Name"/>
+
+    <EditText
+        android:id="@+id/etAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Company Address"/>
+
+    <EditText
+        android:id="@+id/etPhone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Phone Number"
+        android:inputType="phone"/>
+
+    <Button
+        android:id="@+id/btnInsert"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Insert Company"/>
+
+    <Button
+        android:id="@+id/btnViewAll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="View All Companies"/>
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>
+
+
+MainActivity.java)
+
+package com.example.companydatabase;
+
+import android.database.Cursor;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    private EditText etName, etAddress, etPhone;
+    private DatabaseHelper dbHelper;
+    private ListView listView;
+    private ArrayAdapter<String> adapter;
+    private ArrayList<String> companyList;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etName = findViewById(R.id.etName);
+        etAddress = findViewById(R.id.etAddress);
+        etPhone = findViewById(R.id.etPhone);
+        Button btnInsert = findViewById(R.id.btnInsert);
+        Button btnViewAll = findViewById(R.id.btnViewAll);
+        listView = findViewById(R.id.listView);
+
+        dbHelper = new DatabaseHelper(this);
+        companyList = new ArrayList<>();
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, companyList);
+        listView.setAdapter(adapter);
+
+        btnInsert.setOnClickListener(v -> insertCompany());
+        btnViewAll.setOnClickListener(v -> showAllCompanies());
+    }
+
+    private void insertCompany() {
+        String name = etName.getText().toString().trim();
+        String address = etAddress.getText().toString().trim();
+        String phone = etPhone.getText().toString().trim();
+
+        if (name.isEmpty() || address.isEmpty() || phone.isEmpty()) {
+            Toast.makeText(this, "Please enter all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        boolean inserted = dbHelper.insertCompany(name, address, phone);
+        if (inserted) {
+            Toast.makeText(this, "Company Added Successfully", Toast.LENGTH_SHORT).show();
+            etName.setText("");
+            etAddress.setText("");
+            etPhone.setText("");
+        } else {
+            Toast.makeText(this, "Error Adding Company", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void showAllCompanies() {
+        Cursor cursor = dbHelper.getAllCompanies();
+        companyList.clear();
+
+        if (cursor.getCount() == 0) {
+            Toast.makeText(this, "No companies found", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        while (cursor.moveToNext()) {
+            String company = "ID: " + cursor.getString(0) + "\n" +
+                    "Name: " + cursor.getString(1) + "\n" +
+                    "Address: " + cursor.getString(2) + "\n" +
+                    "Phone: " + cursor.getString(3);
+            companyList.add(company);
+        }
+        adapter.notifyDataSetChanged();
+    }
+}

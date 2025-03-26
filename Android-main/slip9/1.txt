@@ -1,0 +1,93 @@
+activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <EditText
+        android:id="@+id/num1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter First Number"
+        android:inputType="number"/>
+
+    <EditText
+        android:id="@+id/num2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Second Number"
+        android:inputType="number"/>
+
+    <Button
+        android:id="@+id/btnSubmit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Submit"/>
+
+    <TextView
+        android:id="@+id/result"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Result will appear here"
+        android:textSize="18sp"
+        android:paddingTop="20dp"/>
+
+</LinearLayout>
+
+
+MainActivity.java
+
+package com.example.validateinput;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    private EditText num1, num2;
+    private TextView result;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        num1 = findViewById(R.id.num1);
+        num2 = findViewById(R.id.num2);
+        Button btnSubmit = findViewById(R.id.btnSubmit);
+        result = findViewById(R.id.result);
+
+        btnSubmit.setOnClickListener(v -> validateNumbers());
+    }
+
+    private void validateNumbers() {
+        String str1 = num1.getText().toString().trim();
+        String str2 = num2.getText().toString().trim();
+
+        if (str1.isEmpty() || str2.isEmpty()) {
+            Toast.makeText(this, "Please enter both numbers", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        int number1 = Integer.parseInt(str1);
+        int number2 = Integer.parseInt(str2);
+
+        if (number1 > 10 && number2 > 10) {
+            Toast.makeText(this, "Both numbers are greater than 10! Please enter new numbers.", Toast.LENGTH_LONG).show();
+            num1.setText("");
+            num2.setText("");
+        } else {
+            result.setText("You entered: " + number1 + " and " + number2);
+        }
+    }
+}
+
+

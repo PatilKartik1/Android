@@ -1,0 +1,212 @@
+DatabaseHelper.java
+
+package com.example.studentdatabase;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+public class DatabaseHelper extends SQLiteOpenHelper {
+
+    private static final String DATABASE_NAME = "StudentDB";
+    private static final int DATABASE_VERSION = 1;
+    private static final String TABLE_NAME = "Student";
+    private static final String COLUMN_ID = "Sid";
+    private static final String COLUMN_NAME = "Sname";
+    private static final String COLUMN_PHONE = "Phno";
+
+    public DatabaseHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        String createTable = "CREATE TABLE " + TABLE_NAME + " (" +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_NAME + " TEXT, " +
+                COLUMN_PHONE + " TEXT)";
+        db.execSQL(createTable);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        onCreate(db);
+    }
+
+    // Insert a new student
+    public boolean addStudent(String name, String phone) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_NAME, name);
+        values.put(COLUMN_PHONE, phone);
+        long result = db.insert(TABLE_NAME, null, values);
+        db.close();
+        return result != -1;
+    }
+
+    // Retrieve all students
+    public Cursor getAllStudents() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+    }
+
+    // Delete a student by ID
+    public boolean deleteStudent(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int result = db.delete(TABLE_NAME, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
+        db.close();
+        return result > 0;
+    }
+}
+
+
+MainActivity.java
+
+package com.example.studentdatabase;
+
+import android.database.Cursor;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.*;
+import androidx.appcompat.app.AppCompatActivity;
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    private EditText nameInput, phoneInput, deleteIdInput;
+    private Button addButton, deleteButton;
+    private ListView listView;
+    private DatabaseHelper dbHelper;
+    private ArrayAdapter<String> adapter;
+    private ArrayList<String> studentList;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        nameInput = findViewById(R.id.nameInput);
+        phoneInput = findViewById(R.id.phoneInput);
+        deleteIdInput = findViewById(R.id.deleteIdInput);
+        addButton = findViewById(R.id.addButton);
+        deleteButton = findViewById(R.id.deleteButton);
+        listView = findViewById(R.id.listView);
+        dbHelper = new DatabaseHelper(this);
+
+        studentList = new ArrayList<>();
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, studentList);
+        listView.setAdapter(adapter);
+
+        loadStudents();
+
+        addButton.setOnClickListener(v -> {
+            String name = nameInput.getText().toString();
+            String phone = phoneInput.getText().toString();
+            if (!name.isEmpty() && !phone.isEmpty()) {
+                if (dbHelper.addStudent(name, phone)) {
+                    Toast.makeText(this, "Student Added!", Toast.LENGTH_SHORT).show();
+                    loadStudents();
+                    nameInput.setText("");
+                    phoneInput.setText("");
+                } else {
+                    Toast.makeText(this, "Failed to Add!", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(this, "Enter Name and Phone!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        deleteButton.setOnClickListener(v -> {
+            String idText = deleteIdInput.getText().toString();
+            if (!idText.isEmpty()) {
+                int id = Integer.parseInt(idText);
+                if (dbHelper.deleteStudent(id)) {
+                    Toast.makeText(this, "Student Deleted!", Toast.LENGTH_SHORT).show();
+                    loadStudents();
+                    deleteIdInput.setText("");
+                } else {
+                    Toast.makeText(this, "ID Not Found!", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(this, "Enter Student ID!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void loadStudents() {
+        studentList.clear();
+        Cursor cursor = dbHelper.getAllStudents();
+        if (cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(0);
+                String name = cursor.getString(1);
+                String phone = cursor.getString(2);
+                studentList.add(id + ". " + name + " - " + phone);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        adapter.notifyDataSetChanged();
+    }
+}
+
+
+activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/nameInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Student Name"/>
+
+    <EditText
+        android:id="@+id/phoneInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Phone Number"
+        android:inputType="phone"/>
+
+    <Button
+        android:id="@+id/addButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add Student"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Delete Student by ID"
+        android:textSize="16sp"
+        android:paddingTop="10dp"/>
+
+    <EditText
+        android:id="@+id/deleteIdInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Student ID"
+        android:inputType="number"/>
+
+    <Button
+        android:id="@+id/deleteButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Delete Student"/>
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>
+
+

@@ -1,0 +1,247 @@
+AndroidManifest.xml 
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.membershipform">
+
+    <application
+        android:allowBackup="true"
+        android:theme="@style/Theme.AppCompat.Light"
+        android:label="Membership Form">
+        <activity android:name=".SecondActivity" />
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
+
+
+activity_main.xml 
+
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Membership Form"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#800080"
+        android:layout_gravity="center" />
+
+    <TableRow>
+        <EditText
+            android:id="@+id/fullName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Full name" />
+    </TableRow>
+
+    <TableRow>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gender" />
+        <RadioGroup
+            android:id="@+id/genderGroup"
+            android:orientation="horizontal">
+            <RadioButton android:id="@+id/male" android:text="M" />
+            <RadioButton android:id="@+id/female" android:text="F" />
+            <RadioButton android:id="@+id/other" android:text="Other" />
+        </RadioGroup>
+    </TableRow>
+
+    <TableRow>
+        <EditText
+            android:id="@+id/weight"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:hint="Current Weight" />
+        <EditText
+            android:id="@+id/height"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:hint="Height" />
+    </TableRow>
+
+    <TableRow>
+        <EditText
+            android:id="@+id/goalWeight"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:hint="Goal Weight" />
+        <EditText
+            android:id="@+id/age"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:hint="Age" />
+    </TableRow>
+
+    <TableRow>
+        <EditText
+            android:id="@+id/phone"
+            android:layout_width="match_parent"
+            android:hint="Phone" />
+    </TableRow>
+
+    <TableRow>
+        <EditText
+            android:id="@+id/address"
+            android:layout_width="match_parent"
+            android:hint="Address" />
+    </TableRow>
+
+    <TableRow>
+        <CheckBox
+            android:id="@+id/checkBox"
+            android:layout_width="wrap_content"
+            android:text="I have read, understood and accepted membership rules" />
+    </TableRow>
+
+    <TableRow>
+        <Button
+            android:id="@+id/submitButton"
+            android:layout_width="wrap_content"
+            android:text="SUBMIT"
+            android:backgroundTint="#800080"
+            android:textColor="#FFFFFF" />
+    </TableRow>
+
+</TableLayout>
+
+
+MainActivity.java
+
+package com.example.membershipform;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    private EditText fullName, weight, height, goalWeight, age, phone, address;
+    private RadioGroup genderGroup;
+    private CheckBox checkBox;
+    private Button submitButton;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        fullName = findViewById(R.id.fullName);
+        weight = findViewById(R.id.weight);
+        height = findViewById(R.id.height);
+        goalWeight = findViewById(R.id.goalWeight);
+        age = findViewById(R.id.age);
+        phone = findViewById(R.id.phone);
+        address = findViewById(R.id.address);
+        genderGroup = findViewById(R.id.genderGroup);
+        checkBox = findViewById(R.id.checkBox);
+        submitButton = findViewById(R.id.submitButton);
+
+        submitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String name = fullName.getText().toString();
+                String weightText = weight.getText().toString();
+                String heightText = height.getText().toString();
+                String goalWeightText = goalWeight.getText().toString();
+                String ageText = age.getText().toString();
+                String phoneText = phone.getText().toString();
+                String addressText = address.getText().toString();
+                String gender = "";
+
+                int selectedId = genderGroup.getCheckedRadioButtonId();
+                if (selectedId != -1) {
+                    RadioButton selectedGender = findViewById(selectedId);
+                    gender = selectedGender.getText().toString();
+                }
+
+                boolean isChecked = checkBox.isChecked();
+
+                Intent intent = new Intent(MainActivity.this, SecondActivity.class);
+                intent.putExtra("name", name);
+                intent.putExtra("weight", weightText);
+                intent.putExtra("height", heightText);
+                intent.putExtra("goalWeight", goalWeightText);
+                intent.putExtra("age", ageText);
+                intent.putExtra("phone", phoneText);
+                intent.putExtra("address", addressText);
+                intent.putExtra("gender", gender);
+                intent.putExtra("agreement", isChecked ? "Accepted" : "Not Accepted");
+
+                startActivity(intent);
+            }
+        });
+    }
+}
+
+activity_second.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:id="@+id/displayData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+</LinearLayout>
+
+SecondActivity.java
+
+
+package com.example.membershipform;
+
+import android.os.Bundle;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class SecondActivity extends AppCompatActivity {
+
+    private TextView displayData;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_second);
+
+        displayData = findViewById(R.id.displayData);
+
+        String name = getIntent().getStringExtra("name");
+        String weight = getIntent().getStringExtra("weight");
+        String height = getIntent().getStringExtra("height");
+        String goalWeight = getIntent().getStringExtra("goalWeight");
+        String age = getIntent().getStringExtra("age");
+        String phone = getIntent().getStringExtra("phone");
+        String address = getIntent().getStringExtra("address");
+        String gender = getIntent().getStringExtra("gender");
+        String agreement = getIntent().getStringExtra("agreement");
+
+        String displayText = "Full Name: " + name + "\nGender: " + gender + "\nWeight: " + weight + 
+                "\nHeight: " + height + "\nGoal Weight: " + goalWeight + "\nAge: " + age + 
+                "\nPhone: " + phone + "\nAddress: " + address + "\nAgreement: " + agreement;
+
+        displayData.setText(displayText);
+    }
+}

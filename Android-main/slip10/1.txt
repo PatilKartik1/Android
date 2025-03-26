@@ -1,0 +1,87 @@
+activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <Switch
+        android:id="@+id/switchButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Switch Button"/>
+
+    <TextView
+        android:id="@+id/tvSwitchStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Switch is OFF"
+        android:textSize="18sp"
+        android:padding="10dp"/>
+
+    <ToggleButton
+        android:id="@+id/toggleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textOn="ON"
+        android:textOff="OFF"/>
+
+    <TextView
+        android:id="@+id/tvToggleStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Toggle is OFF"
+        android:textSize="18sp"
+        android:padding="10dp"/>
+
+</LinearLayout>
+
+
+MainActivity.java
+
+package com.example.switchtoggle;
+
+import android.os.Bundle;
+import android.widget.Switch;
+import android.widget.TextView;
+import android.widget.ToggleButton;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    private TextView tvSwitchStatus, tvToggleStatus;
+    private Switch switchButton;
+    private ToggleButton toggleButton;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        switchButton = findViewById(R.id.switchButton);
+        tvSwitchStatus = findViewById(R.id.tvSwitchStatus);
+        toggleButton = findViewById(R.id.toggleButton);
+        tvToggleStatus = findViewById(R.id.tvToggleStatus);
+
+        switchButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                tvSwitchStatus.setText("Switch is ON");
+            } else {
+                tvSwitchStatus.setText("Switch is OFF");
+            }
+        });
+
+        toggleButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                tvToggleStatus.setText("Toggle is ON");
+            } else {
+                tvToggleStatus.setText("Toggle is OFF");
+            }
+        });
+    }
+}
+
+
+
