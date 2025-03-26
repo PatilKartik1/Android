@@ -1,6 +1,46 @@
+AndroidManifest.xml
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.sendhimessage">
+
+    <application
+        android:allowBackup="true"
+        android:theme="@style/Theme.SendHiMessage">
+
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".SecondActivity"/>
+
+    </application>
+</manifest>
+
+
+activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp">
+
+    <Button
+        android:id="@+id/btnSendMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send Hi Message"/>
+</LinearLayout>
+
+
 MainActivity.java
 
-package com.example.helloapp;
+package com.example.sendhimessage;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,66 +49,29 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button sendButton = findViewById(R.id.sendButton);
+        Button btnSendMessage = findViewById(R.id.btnSendMessage);
 
-        sendButton.setOnClickListener(new View.OnClickListener() {
+        btnSendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Create an Intent to open SecondActivity
                 Intent intent = new Intent(MainActivity.this, SecondActivity.class);
-                intent.putExtra("message", "Hi");
+
+                // Put the message "Hi" in the intent
+                intent.putExtra("MESSAGE", "Hi");
+
+                // Start SecondActivity
                 startActivity(intent);
             }
         });
     }
 }
-
-
-SecondActivity.java
-
-package com.example.helloapp;
-
-import android.os.Bundle;
-import android.widget.TextView;
-import androidx.appcompat.app.AppCompatActivity;
-
-public class SecondActivity extends AppCompatActivity {
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_second);
-
-        TextView messageText = findViewById(R.id.messageText);
-        
-        // Get the message from intent
-        String message = getIntent().getStringExtra("message");
-
-        // Display message
-        messageText.setText("Received Message: " + message);
-    }
-}
-
-
-activity_main.xml 
-
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="20dp">
-
-    <Button
-        android:id="@+id/sendButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Send Hi Message" />
-</LinearLayout>
 
 
 activity_second.xml
@@ -77,20 +80,42 @@ activity_second.xml
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:gravity="center"
+    android:padding="16dp">
 
     <TextView
-        android:id="@+id/messageText"
+        android:id="@+id/tvReceivedMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Message will appear here"
-        android:textSize="18sp"
-        android:textStyle="bold"/>
+        android:text="Waiting for message..."
+        android:textSize="20sp"/>
 </LinearLayout>
 
 
-AndroidManifest.xml
+SecondActivity.java
 
-<activity android:name=".SecondActivity" />
+package com.example.sendhimessage;
+
+import android.os.Bundle;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class SecondActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_second);
+
+        TextView tvReceivedMessage = findViewById(R.id.tvReceivedMessage);
+
+        // Retrieve the message from Intent
+        String message = getIntent().getStringExtra("MESSAGE");
+
+        // Set the received message to TextView
+        tvReceivedMessage.setText("Received Message: " + message);
+    }
+}
+
+

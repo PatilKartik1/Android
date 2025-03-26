@@ -1,0 +1,218 @@
+AndroidManifest.xml
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.contactlayout">
+
+    <application
+        android:allowBackup="true"
+        android:theme="@style/Theme.ContactLayout">
+
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+    </application>
+</manifest>
+
+
+activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Contacts"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:paddingBottom="10dp"/>
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+</LinearLayout>
+
+
+contact_item.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="10dp"
+    android:background="@android:color/white"
+    android:elevation="2dp">
+
+    <!-- Contact Image -->
+    <ImageView
+        android:id="@+id/contactImage"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/ic_person"
+        android:scaleType="centerCrop"
+        android:layout_marginEnd="10dp"/>
+
+    <!-- Contact Details -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/contactName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Name"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/contactNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Phone Number"
+            android:textSize="14sp"/>
+
+        <TextView
+            android:id="@+id/contactEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Email ID"
+            android:textSize="14sp"
+            android:textColor="@android:color/holo_blue_dark"/>
+    </LinearLayout>
+</LinearLayout>
+
+
+Contact.java
+
+package com.example.contactlayout;
+
+public class Contact {
+    private String name;
+    private String phone;
+    private String email;
+    private int imageResource;
+
+    public Contact(String name, String phone, String email, int imageResource) {
+        this.name = name;
+        this.phone = phone;
+        this.email = email;
+        this.imageResource = imageResource;
+    }
+
+    public String getName() { return name; }
+    public String getPhone() { return phone; }
+    public String getEmail() { return email; }
+    public int getImageResource() { return imageResource; }
+}
+
+
+ContactAdapter.java
+
+package com.example.contactlayout;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import java.util.List;
+
+public class ContactAdapter extends BaseAdapter {
+    private Context context;
+    private List<Contact> contactList;
+
+    public ContactAdapter(Context context, List<Contact> contactList) {
+        this.context = context;
+        this.contactList = contactList;
+    }
+
+    @Override
+    public int getCount() {
+        return contactList.size();
+    }
+
+    @Override
+    public Object getItem(int position) {
+        return contactList.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        if (convertView == null) {
+            convertView = LayoutInflater.from(context).inflate(R.layout.contact_item, parent, false);
+        }
+
+        Contact contact = contactList.get(position);
+
+        ImageView imageView = convertView.findViewById(R.id.contactImage);
+        TextView nameView = convertView.findViewById(R.id.contactName);
+        TextView phoneView = convertView.findViewById(R.id.contactNumber);
+        TextView emailView = convertView.findViewById(R.id.contactEmail);
+
+        imageView.setImageResource(contact.getImageResource());
+        nameView.setText(contact.getName());
+        phoneView.setText(contact.getPhone());
+        emailView.setText(contact.getEmail());
+
+        return convertView;
+    }
+}
+
+
+MainActivity.java
+
+package com.example.contactlayout;
+
+import android.os.Bundle;
+import android.widget.ListView;
+import androidx.appcompat.app.AppCompatActivity;
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity {
+
+    private ListView listView;
+    private List<Contact> contactList;
+    private ContactAdapter adapter;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        listView = findViewById(R.id.listView);
+        contactList = new ArrayList<>();
+
+        // Adding contacts manually
+        contactList.add(new Contact("John Doe", "123-456-7890", "johndoe@example.com", R.drawable.ic_person));
+        contactList.add(new Contact("Jane Smith", "987-654-3210", "janesmith@example.com", R.drawable.ic_person));
+        contactList.add(new Contact("Alice Johnson", "555-678-1234", "alicej@example.com", R.drawable.ic_person));
+        contactList.add(new Contact("Bob Williams", "444-555-6666", "bobw@example.com", R.drawable.ic_person));
+
+        adapter = new ContactAdapter(this, contactList);
+        listView.setAdapter(adapter);
+    }
+}
+
+
+
